@@ -30,7 +30,7 @@ export const DB = {
             return data.getScore(typeof args[0] == 'string' ? data.getParticipants().find(ob => ob.displayName == args[0]) : args[0].scoreboard);
         } catch {
             console.warn('An error occurred getting a value');
-            return NaN
+            return NaN;
         }
     }
     
