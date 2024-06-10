@@ -25,7 +25,7 @@ console.log(a) // 10
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Tareas</title>
+    <title>Piedra, Papel o Tijeras</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -44,99 +44,117 @@ console.log(a) // 10
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             width: 300px;
-        }
-
-        h1 {
             text-align: center;
         }
 
-        h2 {
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .choice {
+            cursor: pointer;
+            padding: 10px;
+            font-size: 2em;
+        }
+
+        .result {
             margin-top: 20px;
+            font-size: 1.2em;
         }
 
-        .task-list {
-            list-style: none;
-            padding: 0;
+        .win {
+            color: green;
         }
 
-        .task-list li {
+        .lose {
+            color: red;
+        }
+
+        .draw {
+            color: orange;
+        }
+
+        .battlefield {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
-            background: #eee;
-            margin-bottom: 5px;
-            border-radius: 5px;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 2em;
+            height: 50px;
         }
 
-        .task-list li.completed {
-            text-decoration: line-through;
-            background: #d4edda;
+        .option {
+            font-size: 2em;
         }
 
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        input, select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+        .player-option {
+            font-size: 2em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Lista de Tareas</h1>
-        
-        <input type="text" id="task-input" placeholder="Nueva tarea...">
-        <select id="task-type">
-            <option value="escuela">Escuela</option>
-            <option value="trabajo">Trabajo</option>
-        </select>
-        <button onclick="addTask()">Añadir Tarea</button>
-        
-        <h2>Escuela</h2>
-        <ul id="escuela-list" class="task-list">
-            <!-- Tareas de la escuela aparecerán aquí -->
-        </ul>
-        
-        <h2>Trabajo</h2>
-        <ul id="trabajo-list" class="task-list">
-            <!-- Tareas de trabajo aparecerán aquí -->
-        </ul>
+        <h1>Piedra, Papel o Tijeras</h1>
+        <div class="battlefield">
+            <div id="computer-choice" class="option">❓</div>
+            <div id="player-choice" class="option"></div>
+        </div>
+        <div class="choices">
+            <div class="choice" onclick="play('🪨')">🪨</div>
+            <div class="choice" onclick="play('📄')">📄</div>
+            <div class="choice" onclick="play('✂️')">✂️</div>
+        </div>
+        <div class="result" id="result"></div>
     </div>
     <script>
-        function addTask() {
-            const input = document.getElementById('task-input');
-            const taskText = input.value.trim();
-            const taskType = document.getElementById('task-type').value;
+        const choices = ['🪨', '📄', '✂️'];
+        let computerInterval;
 
-            if (taskText !== "") {
-                const taskList = document.getElementById(`${taskType}-list`);
-
-                const li = document.createElement("li");
-                li.textContent = taskText;
-                li.onclick = () => toggleTaskStatus(li);
-                
-                taskList.appendChild(li);
-                input.value = "";
-            }
+        function startAnimation() {
+            let index = 0;
+            computerInterval = setInterval(() => {
+                document.getElementById('computer-choice').textContent = choices[index];
+                index = (index + 1) % choices.length;
+            }, 200);
         }
 
-        function toggleTaskStatus(taskElement) {
-            taskElement.classList.toggle("completed");
+        function stopAnimation() {
+            clearInterval(computerInterval);
+        }
+
+        function play(playerChoice) {
+            document.getElementById('player-choice').textContent = playerChoice;
+            startAnimation();
+
+            setTimeout(() => {
+                stopAnimation();
+                const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+                document.getElementById('computer-choice').textContent = computerChoice;
+
+                let result = '';
+                if (playerChoice === computerChoice) {
+                    result = `Empate! Ambos eligieron ${playerChoice}.`;
+                    document.getElementById('result').className = 'result draw';
+                } else if (
+                    (playerChoice === '🪨' && computerChoice === '✂️') ||
+                    (playerChoice === '📄' && computerChoice === '🪨') ||
+                    (playerChoice === '✂️' && computerChoice === '📄')
+                ) {
+                    result = `Ganaste! ${playerChoice} vence a ${computerChoice}.`;
+                    document.getElementById('result').className = 'result win';
+                } else {
+                    result = `Perdiste! ${computerChoice} vence a ${playerChoice}.`;
+                    document.getElementById('result').className = 'result lose';
+                }
+
+                document.getElementById('result').textContent = result;
+            }, 2000);  // La animación dura 2 segundos antes de mostrar el resultado
         }
     </script>
 </body>
